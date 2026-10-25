@@ -2,6 +2,12 @@
 
 MQTT is a popular network protocol in IoT communication. In this task we will use the protocol to communicate with a IoT Server reached at https://iot.mastodon-buri.ts.net.
 
+## Task
+
+1. Connect your arduino to the thingsboard server
+2. Send the RSSI value (wifi connection strength) as telemetry every second to the server
+3. Make the arduinos builtin led blink at 0.7 Hz
+
 ## Setup IoT Server
 
 1. Try opening the servers Webpage and login with your account
@@ -29,8 +35,9 @@ MQTT is a popular network protocol in IoT communication. In this task we will us
 - make sure to connect to the server on port 10000
 - Send the RSSI every second as telemetry
   - send the data with topic: v1/devices/me/telemetry
+  - you can get the RSSI with: WiFi.RSSI();
 
-3. **Make the Arduino blink every 700 ms**:
+3. **Make the Arduino blink**:
 
-- you should avoid the delay function for this, as it blocks execution
+- you should avoid the delay function for this, as it blocks execution. While blocked, you can not send telemetry data
 - find out how you can run two tasks (blinking and telemetry sending) simultaniously
