@@ -26,9 +26,11 @@
 WiFiSSLClient wifiClient;
 PubSubClient client(wifiClient);
 
+int rssi = 0;
+
 // definition of poll based tasks
 // look at loop function
-TelemetryTask telemetryTask(1.0);
+TelemetryTask<int> telemetryTask(1., "rssi", rssi);
 BlinkTask blinkTask(LED_BUILTIN, 2.0);
 
 // this function is called every time the device receives a message from the
@@ -127,8 +129,15 @@ void loop() {
   // callback function
   client.loop();
 
+  // read values
+  rssi = WiFi.RSSI();
+
   // two poll based tasks to simulate parallelism
   // check out src/common/blink and src/common/telemetry
-  telemetryTask.poll(client);
-  blinkTask.poll();
+  auto tel = telemetryTask.poll(client);
+  auto bli = blinkTask.poll();
+
+  // dont busy loop if no task was ready
+  if (!tel && !bli)
+    delay(10);
 }

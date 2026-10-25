@@ -36,17 +36,25 @@ void setup() {
   client.setServer(MQTT_ENDPOINT, MQTT_PORT);
 }
 
+int rssi = 0;
+
 // definition of poll based tasks
 // look at loop function
-TelemetryTask telemetryTask(1.0);
-BlinkTask blinkTask(LED_BUILTIN, 2.0);
+TelemetryTask<int> telemetryTask(1., "rssi", rssi);
+BlinkTask blinkTask(LED_BUILTIN, 0.7);
 
 void loop() {
   connectMQTT(client, CLIENT_ID, USER_NAME, PASSWD);
   client.loop();
 
+  // read values
+  rssi = WiFi.RSSI();
+
   // two tasks run in "parallel"
-  // one sends telemetry every 1000ms and the other blinks every 700ms
-  telemetryTask.poll(client);
-  blinkTask.poll();
+  auto tel = telemetryTask.poll(client);
+  auto bli = blinkTask.poll();
+
+  // dont busy loop if no task was ready
+  if (!tel && !bli)
+    delay(10);
 }
