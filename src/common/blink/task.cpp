@@ -24,12 +24,12 @@ float BlinkTask::getFrequency() {
 }
 
 // this function polls the task
-void BlinkTask::poll() {
+bool BlinkTask::poll() {
   // the timer is checked first thing on every poll
   // if it isnt elapsed, the poll returns and the task does nothing
   //   -> the task waits for the timer
   if (!timer_.elapsed())
-    return;
+    return false;
   // if the timer is elapsed, its reset, so it can run again
   timer_.restart();
 

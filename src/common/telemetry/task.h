@@ -4,13 +4,15 @@
 #include "PubSubClient.h"
 #include "timer.h"
 
-class TelemetryTask {
+template <typename V> class TelemetryTask {
 public:
-  explicit TelemetryTask(float freq);
-  void poll(PubSubClient &);
+  TelemetryTask(float freq, const char *key, const V &value);
+  bool poll(PubSubClient &);
 
 private:
   Timer timer_;
+  const char *key_;
+  const V &ref_;
 };
 
 #endif

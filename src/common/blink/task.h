@@ -12,7 +12,7 @@ class BlinkTask {
 public:
   BlinkTask(pin_size_t pin, float frequency);
 
-  void poll();
+  bool poll();
   void setEnabled(bool);
 
   void setFrequency(float);
