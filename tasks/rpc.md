@@ -11,8 +11,8 @@ MQTT is a popular network protocol in IoT communication. In this task we will us
 ## Setup IoT Server
 
 1. Try opening the servers Webpage and login with your account
-2. On the left side under “Entities” click “Devices”
-3. Click on “Add device” → “Add new device”
+2. On the left side under "Entities" click "Devices"
+3. Click on "Add device" → "Add new device"
 4. Set a name of your choice
 5. Setup credentials
    1. Click on MQTT Basic
