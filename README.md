@@ -12,12 +12,19 @@ The _env file is gitignored and not visible here on github, to keep passwords an
 You must create it and initialize your secret variables.
 
 ```cpp
-const char MQTT_ENDPOINT[] = "iot.some-domain.net";
+#pragma once
+
+const char SERVER_URL[] = "example.net";
+
 const int MQTT_PORT = 10000;
-const char CLIENT_ID[] = "some client id";
-const char USER_NAME[] = "some client id";
-const char PASSWD[] = "some client id";
+const int HTTPS_PORT = 443;
+
+
+const char CLIENT_ID[] = "a client id for mqtt";
+const char USER_NAME[] = "a user name for mqtt/http";
+const char PASSWD[] = "a password for mqtt";
 
 const char WIFI_SSID[] = "your wifi";
 const char WIFI_PASSWD[] = "your wifi password";
+
 ```
