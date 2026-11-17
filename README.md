@@ -1,6 +1,15 @@
 # Arduino MQTT + Thingsboard example
 
-## the _env file
+This repo contains a few code examples for arduino to interact with a thingsboard server.
+Currently 3 code examples are provided:
+
+- telemetry (mqtt)
+- telemetry (https)
+- rpc (remote procedure call)
+
+Also a tutorial how to setup alarms in thingsboard is provided in ./examples
+
+## The _env file
 
 You may have noticed, that all examples include a _env file:
 
