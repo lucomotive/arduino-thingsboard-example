@@ -6,7 +6,7 @@
 #include "PubSubClient.h"
 // the WiFiNINA library is specifically designed for the arduino nano 33 iot.
 // make sure to use the correct one for your board
-#include "WiFiNINA.h"
+#include "WiFi.h"
 #include "WiFiSSLClient.h"
 #include "api/Common.h"
 #include "common/mqtt.h"

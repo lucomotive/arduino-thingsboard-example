@@ -3,7 +3,6 @@
 #ifndef HTTP_H
 #define HTTP_H
 
-#include "ArduinoHttpClient.h"
 #include "ArduinoJson.h"
 #include "HttpClient.h"
 #include "_env"
