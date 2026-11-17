@@ -1,4 +1,5 @@
-
+#ifndef CONNECT_WIFI_H
+#define CONNECT_WIFI_H
 
 #include "Arduino.h"
 #include "WiFiNINA.h"
@@ -17,3 +18,5 @@ void connectWiFi(const char *const ssid, const char *const passwd) {
   Serial.print("\n");
   Serial.println("WiFi connected");
 }
+
+#endif
