@@ -8,8 +8,8 @@
 #include "WiFiSSLClient.h"
 #include "api/Common.h"
 #include "common/mqtt.h"
+#include "common/timer.h"
 #include "common/wifi.h"
-#include "timer.h"
 #include "variant.h"
 
 // setup a wifi client and mqtt client
