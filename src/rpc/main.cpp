@@ -3,25 +3,31 @@
 
 #include "_env"
 
-#include "ArduinoJson.h"
 #include "PubSubClient.h"
+// the WiFiNINA library is specifically designed for the arduino nano 33 iot.
+// make sure to use the correct one for your board
 #include "WiFiNINA.h"
 #include "WiFiSSLClient.h"
-#include "common/blink/task.h"
-#include "common/mqtt/connect.h"
-#include "common/telemetry/task.h"
-#include "common/wifi/connect.h"
+#include "api/Common.h"
+#include "common/mqtt.h"
+#include "common/wifi.h"
+#include "timer.h"
+#include "variant.h"
 
 // setup a wifi client and mqtt client
 WiFiSSLClient wifiClient;
-PubSubClient client(wifiClient);
+PubSubClient mqttClient(wifiClient);
 
+// setup timers for async programming
+
+// timer and variables for telemetry
+poll_timer_t telemetry_timer{.start_ = 0, .duration_ = 2000};
 int rssi = 0;
 
-// definition of poll based tasks
-// look at loop function
-TelemetryTask<int> telemetryTask(1., "rssi", rssi);
-BlinkTask blinkTask(LED_BUILTIN, 2.0);
+// timer and variables for led blink
+poll_timer_t blink_timer{.start_ = 0, .duration_ = 1000};
+bool led_state = false;
+bool enable_blink = true;
 
 // this function is called every time the device receives a message from the
 // server
@@ -68,7 +74,7 @@ void callback(char *topic, byte *payload, unsigned int length) {
       // get the parameters. is it a float?
       if (doc["params"].is<float>()) {
         auto freq = doc["params"].as<float>();
-        blinkTask.setFrequency(freq);
+        blink_timer.duration_ = 1000. / freq;
         Serial.println(String("Setting blink frequency to ") + freq);
       } else
         Serial.println("Received faulty parameter");
@@ -77,12 +83,12 @@ void callback(char *topic, byte *payload, unsigned int length) {
     else if (String(method) == "getFreq") {
       String responseTopic = "v1/devices/me/rpc/response/" + requestId;
 
-      float freq = blinkTask.getFrequency();
+      float freq = 1000. / (float)(blink_timer.duration_);
       Serial.println("Received RPC getFreq.");
       Serial.println("Responding with " + String(freq));
 
       // send back the response
-      client.publish(responseTopic.c_str(), String(freq).c_str());
+      mqttClient.publish(responseTopic.c_str(), String(freq).c_str());
     }
 
   }
@@ -91,7 +97,7 @@ void callback(char *topic, byte *payload, unsigned int length) {
   else if (topicStr == "v1/devices/me/attributes") {
     // check if a field "blink" that holds a boolean is in the json
     if (doc["blink"].is<bool>())
-      blinkTask.setEnabled(doc["blink"].as<bool>());
+      enable_blink = doc["blink"].as<bool>();
   }
 }
 
@@ -108,26 +114,40 @@ void setup() {
   connectWiFi(WIFI_SSID, WIFI_PASSWD);
 
   // set server and register callback function
-  client.setServer(MQTT_ENDPOINT, MQTT_PORT);
-  client.setCallback(callback);
+  mqttClient.setServer(SERVER_URL, MQTT_PORT);
+  mqttClient.setCallback(callback);
 }
 
 void loop() {
   // each loop the connection is checked
-  connectMQTT(client, CLIENT_ID, USER_NAME, PASSWD);
+  mqtt::connect(mqttClient, CLIENT_ID, USER_NAME, PASSWD);
   // this ticks the client. it checks for incoming messages and calls the
   // callback function
-  client.loop();
+  mqttClient.loop();
 
-  // read values
+  // read ssensor values
   rssi = WiFi.RSSI();
 
-  // two poll based tasks to simulate parallelism
-  // check out src/common/blink and src/common/telemetry
-  auto tel = telemetryTask.poll(client);
-  auto bli = blinkTask.poll();
+  // get the current time
+  unsigned long now = millis();
 
-  // dont busy loop if no task was ready
-  if (!tel && !bli)
-    delay(10);
+  bool telemetry_rdy = poll_timer(&telemetry_timer, now);
+  if (telemetry_rdy) {
+    telemetry_timer.start_ = now; // reset
+    mqtt::send_telemetry(mqttClient, "rssi", rssi);
+  }
+
+  bool blink_rdy = poll_timer(&blink_timer, now);
+  if (blink_rdy) {
+    blink_timer.start_ = now; // reset
+    if (enable_blink) {
+      digitalWrite(LED_BUILTIN, led_state);
+      led_state = !led_state;
+    }
+  }
+
+  // if neither tasks fired, yield
+  // this *can* give the µC time for other background tasks
+  if (!blink_rdy && !telemetry_rdy)
+    yield();
 }
