@@ -2,6 +2,7 @@
 
 #include "task.h"
 #include "Arduino.h"
+#include "timer.h"
 
 // this constructor takes a pin and a frequency.
 // the pin specifies the pin the blinking led is on.
@@ -9,7 +10,9 @@
 //
 // the frequency is converted to ms and sets the duration of the timer
 BlinkTask::BlinkTask(pin_size_t pin, float freq)
-    : timer_(1000.0f / freq / 2.0f), pin_(pin) {}
+    : timer_{.start_ = millis(),
+             .duration_ = (unsigned int)(1000.0f / freq / 2.0f)},
+      pin_(pin) {}
 
 // this enables/disables the task
 void BlinkTask::setEnabled(bool enabled) {
@@ -18,20 +21,24 @@ void BlinkTask::setEnabled(bool enabled) {
 }
 
 // this functions sets the frequency, to easily change it in the main.cpp file
-void BlinkTask::setFrequency(float freq) { timer_.set(1000.0f / freq / 2.0f); }
+void BlinkTask::setFrequency(float freq) {
+  timer_.duration_ = 1000.0f / freq / 2.0f;
+}
 float BlinkTask::getFrequency() {
-  return 1000.0f / (float)timer_.duration() / 2.0f;
+  return 1000.0f / (float)timer_.duration_ / 2.0f;
 }
 
 // this function polls the task
 bool BlinkTask::poll() {
+  const unsigned long now = millis();
   // the timer is checked first thing on every poll
   // if it isnt elapsed, the poll returns and the task does nothing
   //   -> the task waits for the timer
-  if (!timer_.elapsed())
+  if (!poll_timer(&timer_, now))
     return false;
-  // if the timer is elapsed, its reset, so it can run again
-  timer_.restart();
+
+  // if the timer is elapsed, reset it, so it can run again
+  timer_.start_ = now;
 
   // the state is reversed
   // on -> off
@@ -40,4 +47,6 @@ bool BlinkTask::poll() {
   // the led is set according to the state,
   // but it is only on, if both the state and enabled variable are true
   digitalWrite(pin_, state_ && enabled_);
+
+  return true;
 }

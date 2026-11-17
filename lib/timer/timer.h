@@ -1,18 +1,22 @@
 #ifndef POLL_TIMER_H
 #define POLL_TIMER_H
 
-class Timer {
-public:
-  explicit Timer(unsigned int);
+#include <stdbool.h>
 
-  bool elapsed();
-  void restart();
-  void set(unsigned int);
-  unsigned int duration();
+#ifdef __cplusplus
+extern "C" {
+#endif
 
-private:
+typedef struct {
   unsigned long start_;
-  unsigned int duration_;
-};
+  unsigned long duration_;
+} poll_timer_t;
+
+// returns true when timer is elapsed
+bool poll_timer(poll_timer_t *timer, unsigned long now);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif

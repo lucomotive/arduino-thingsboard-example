@@ -10,7 +10,7 @@ public:
   bool poll(PubSubClient &);
 
 private:
-  Timer timer_;
+  poll_timer_t timer_;
   const char *key_;
   const V &ref_;
 };

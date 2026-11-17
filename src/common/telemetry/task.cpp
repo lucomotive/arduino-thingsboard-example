@@ -15,15 +15,20 @@ const char TOPIC[] = "v1/devices/me/telemetry";
 // it only takes in a frequency, how often the device sends telemetry per second
 template <typename V>
 TelemetryTask<V>::TelemetryTask(float freq, const char *key, const V &value)
-    : timer_(1000.0f / freq), key_(key), ref_(value) {}
+    : timer_{.start_ = millis(), .duration_ = (unsigned long)(1000.0f / freq)},
+      key_(key), ref_(value) {}
 
 // like the blink task, this functions polls the TelemetryTask.
 // it waits for the timer, checks if the mqtt client is connected and sends a
 // simple rssi value to the server
 template <typename V> bool TelemetryTask<V>::poll(PubSubClient &client) {
-  if (!timer_.elapsed())
+  const unsigned long now = millis();
+
+  if (!poll_timer(&timer_, now))
     return false;
-  timer_.restart();
+
+  // if the timer is elapsed, reset it, so it can run again
+  timer_.start_ = now;
 
   // only works if mqtt is connected
   if (!client.connected()) {
@@ -42,6 +47,8 @@ template <typename V> bool TelemetryTask<V>::poll(PubSubClient &client) {
 
   Serial.print("Telemetry sent: ");
   Serial.println(payload);
+
+  return true;
 }
 
 // needed for linker

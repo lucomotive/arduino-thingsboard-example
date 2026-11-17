@@ -21,7 +21,7 @@ public:
 private:
   bool state_ = false;
 
-  Timer timer_;
+  poll_timer_t timer_;
 
   pin_size_t pin_;
   bool enabled_ = true;
