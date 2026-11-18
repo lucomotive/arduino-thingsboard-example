@@ -27,7 +27,7 @@ void setup() {
   mqttClient.setServer(SERVER_URL, MQTT_PORT);
 }
 
-// setup timer and task variables for async programming
+// setup timer for async programming
 poll_timer_t telemetry_timer{.start_ = 0, .duration_ = 3300};
 
 void loop() {
