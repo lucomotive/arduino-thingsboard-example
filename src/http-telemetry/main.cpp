@@ -69,9 +69,4 @@ void loop() {
     digitalWrite(LED_BUILTIN, led_state);
     led_state = !led_state;
   }
-
-  // if neither tasks fired, yield
-  // this *can* give the µC time for other background tasks
-  if (!blink_rdy && !rssi_rdy && !temp_rdy)
-    yield();
 }

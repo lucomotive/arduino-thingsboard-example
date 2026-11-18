@@ -143,9 +143,4 @@ void loop() {
       led_state = !led_state;
     }
   }
-
-  // if neither tasks fired, yield
-  // this *can* give the µC time for other background tasks
-  if (!blink_rdy && !telemetry_rdy)
-    yield();
 }
