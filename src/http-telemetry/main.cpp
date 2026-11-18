@@ -16,42 +16,35 @@ void setup() {
   while (!Serial)
     ;
 
+  // seutp led
   pinMode(LED_BUILTIN, OUTPUT);
 
-  connectWiFi(WIFI_SSID, WIFI_PASSWD);
+  wifi::connect(WIFI_SSID, WIFI_PASSWD);
 
   httpClient.connectionKeepAlive();
 }
 
 // setup timers for async programming
-
-// timer and variables for telemetry
 poll_timer_t rssi_telemetry_timer{.start_ = 0, .duration_ = 2000};
-int rssi = 0;
-
-// timer and variables for telemetry
 poll_timer_t temp_telemetry_timer{.start_ = 0, .duration_ = 3300};
-int temp = 0;
-
-// timer and variables for led blink
 poll_timer_t blink_timer{.start_ = 0, .duration_ = 1000};
 bool led_state = false;
 
 void loop() {
   // read sensor values
-  rssi = WiFi.RSSI();
-  temp = random() % 16 + 70; // in a real application, read the sensor
+  const int rssi = WiFi.RSSI();
+  const int temp = random() % 16 + 70; // in a real application, read the sensor
 
   // get the current time
-  unsigned long now = millis();
+  const unsigned long now = millis();
 
-  bool rssi_rdy = poll_timer(&rssi_telemetry_timer, now);
+  const bool rssi_rdy = poll_timer(&rssi_telemetry_timer, now);
   if (rssi_rdy) {
     rssi_telemetry_timer.start_ = now; // reset
     http::send_telemetry(httpClient, "rssi", rssi);
   }
 
-  bool temp_rdy = poll_timer(&temp_telemetry_timer, now);
+  const bool temp_rdy = poll_timer(&temp_telemetry_timer, now);
   if (temp_rdy) {
     temp_telemetry_timer.start_ = now; // reset
     http::send_telemetry(httpClient, "temp", temp);
@@ -60,7 +53,7 @@ void loop() {
     led_state = !led_state;
   }
 
-  bool blink_rdy = poll_timer(&blink_timer, now);
+  const bool blink_rdy = poll_timer(&blink_timer, now);
   if (blink_rdy) {
     blink_timer.start_ = now; // reset
     digitalWrite(LED_BUILTIN, led_state);
