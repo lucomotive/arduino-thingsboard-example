@@ -1,6 +1,3 @@
-// run with
-// pio run -e http -t upload && pio device monitor
-
 #include "_env"
 
 #include "HttpClient.h"

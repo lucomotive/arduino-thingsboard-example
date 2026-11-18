@@ -1,6 +1,3 @@
-// run with
-// pio run -e telemetry -t upload && pio device monitor
-
 #include "_env"
 
 #include "PubSubClient.h"

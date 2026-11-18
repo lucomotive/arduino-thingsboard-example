@@ -1,6 +1,3 @@
-// run with
-// pio run -e rpc -t upload && pio device monitor
-
 #include "_env"
 
 #include "PubSubClient.h"
