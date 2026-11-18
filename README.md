@@ -9,6 +9,30 @@ Currently 3 code examples are provided:
 
 Also a tutorial how to setup alarms in thingsboard is provided in ./examples
 
+## Run example
+
+To compile and flash an example you can use the following command:
+
+```bash
+pio run -e <example> -t upload
+```
+
+Fill in the examples folder name for `<example>`.
+
+To open the serial console for the arduino use:
+
+```bash
+pio device monitor
+```
+
+You can use
+
+```bash
+pio run -e <example> -t upload && pio device monitor
+```
+
+to run both commands sequentially.
+
 ## The _env file
 
 You may have noticed, that all examples include a _env file:
