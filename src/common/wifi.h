@@ -4,8 +4,10 @@
 #include "Arduino.h"
 #include "WiFiNINA.h"
 
+namespace wifi {
+
 // this function connects the device to a wifi network
-void connectWiFi(const char *const ssid, const char *const passwd) {
+void connect(const char *const ssid, const char *const passwd) {
   if (passwd)
     WiFi.begin(ssid, passwd);
   else
@@ -18,5 +20,7 @@ void connectWiFi(const char *const ssid, const char *const passwd) {
   Serial.print("\n");
   Serial.println("WiFi connected");
 }
+
+}; // namespace wifi
 
 #endif
